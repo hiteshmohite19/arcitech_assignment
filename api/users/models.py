@@ -3,29 +3,22 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.contrib.auth.base_user import BaseUserManager
 
 from uuid import uuid4
+
 # Create your models here.
 
 
 class UserManager(BaseUserManager):
 
-    def create_superuser(
-        self, email, username, mobile_no, first_name, password, **kwargs
-    ):
+    def create_superuser(self, email, mobile_no, password, **kwargs):
         kwargs.setdefault("is_active", True)
         kwargs.setdefault("is_staff", True)
-        kwargs.setdefault("is_admin", True)
+        kwargs.setdefault("is_superuser", True)
 
-        self.create_user(email, username, mobile_no, first_name, password, **kwargs)
+        self.create_user(email, mobile_no, password, **kwargs)
 
-    def create_user(
-        self, email, username, mobile_no, first_name, password=None, **kwargs
-    ):
+    def create_user(self, email, mobile_no, password=None, **kwargs):
         user = self.model(
-            email=self.normalize_email(email),
-            username=username,
-            mobile_no=mobile_no,
-            first_name=first_name,
-            **kwargs
+            email=self.normalize_email(email), mobile_no=mobile_no, **kwargs
         )
         user.set_password(password)
         user.save()
@@ -42,7 +35,7 @@ def password_validator(password):
 
 class User(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(primary_key=True, editable=False, default=uuid4)
-    email = models.CharField(blank=False, unique=True)
+    email = models.EmailField(blank=False, unique=True, null=False)
     mobile_no = models.CharField(max_length=10, unique=True)
     full_name = models.CharField(max_length=100, blank=False)
     password = models.CharField(validators=[password_validator])
@@ -54,11 +47,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
 
     user_manager = UserManager()
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["email", "full_name"]
+    REQUIRED_FIELDS = ["full_name", "mobile_no"]
 
     def __str__(self):
         return self.email

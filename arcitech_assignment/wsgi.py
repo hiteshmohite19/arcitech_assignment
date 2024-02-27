@@ -8,9 +8,10 @@ https://docs.djangoproject.com/en/5.0/howto/deployment/wsgi/
 """
 
 import os
+from api.factory import UserFactory
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'arcitech_assignment.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "arcitech_assignment.settings")
 
 application = get_wsgi_application()
